@@ -12,9 +12,6 @@ type DirectCommand struct {
 
 func (rpc *RPC) DirectCommand(ctx context.Context, request string) (DirectCommand, error) {
 	command := DirectCommand{Request: request}
-	if rpc.endpointVersion.Git != "" {
-		return command, nil
-	}
 
 	if rpc.transport == nil {
 		return command, rpcWrapper.ErrTransportNotConnected
@@ -23,7 +20,10 @@ func (rpc *RPC) DirectCommand(ctx context.Context, request string) (DirectComman
 	returnChan := make(chan []byte)
 	defer close(returnChan)
 	rpc.transport.RegisterOneshotReader("", returnChan)
-	rpc.transport.SendMessage(ctx, request)
+	sendErr := rpc.transport.SendMessage(ctx, request)
+	if sendErr != nil {
+		return command, sendErr
+	}
 
 	select {
 	case value := <-returnChan:

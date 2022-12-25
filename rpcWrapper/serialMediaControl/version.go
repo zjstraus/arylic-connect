@@ -38,7 +38,10 @@ func (rpc *RPC) GetVersion(ctx context.Context) (EndpointVersion, error) {
 	returnChan := make(chan []byte)
 	defer close(returnChan)
 	rpc.transport.RegisterOneshotReader(replyPrefix, returnChan)
-	rpc.transport.SendMessage(ctx, request)
+	sendErr := rpc.transport.SendMessage(ctx, request)
+	if sendErr != nil {
+		return EndpointVersion{}, sendErr
+	}
 
 	select {
 	case value := <-returnChan:
