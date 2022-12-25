@@ -10,3 +10,10 @@ type RPC struct {
 func New(t transport.AsyncLine) *RPC {
 	return &RPC{transport: t}
 }
+
+func (rpc *RPC) Close() error {
+	if rpc.transport != nil {
+		return rpc.transport.Close()
+	}
+	return nil
+}
