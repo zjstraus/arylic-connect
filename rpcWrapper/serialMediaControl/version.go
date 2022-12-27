@@ -1,7 +1,6 @@
 package serialMediaControl
 
 import (
-	"arylic-connect/rpcWrapper"
 	"arylic-connect/transport"
 	"context"
 	"errors"
@@ -19,10 +18,6 @@ func (rpc *RPC) GetVersion(ctx context.Context) (EndpointVersion, error) {
 		return rpc.endpointVersion, nil
 	}
 
-	if rpc.transport == nil {
-		return EndpointVersion{}, rpcWrapper.ErrTransportNotConnected
-	}
-
 	request := ""
 	replyPrefix := ""
 	switch rpc.transport.Flavor() {
@@ -31,33 +26,21 @@ func (rpc *RPC) GetVersion(ctx context.Context) (EndpointVersion, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VER:"
 	}
 
-	if request == "" {
-		return EndpointVersion{}, rpcWrapper.ErrUnknownTransportFlavor
+	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	if reqErr != nil {
+		return EndpointVersion{}, reqErr
 	}
 
-	returnChan := make(chan []byte)
-	defer close(returnChan)
-	rpc.transport.RegisterOneshotReader(replyPrefix, returnChan)
-	sendErr := rpc.transport.SendMessage(ctx, request)
-	if sendErr != nil {
-		return EndpointVersion{}, sendErr
+	parser := regexp.MustCompile(`VER:(\d+)-(\w+)-(\d+)`)
+	matches := parser.FindSubmatch(data)
+	if matches == nil {
+		return EndpointVersion{}, errors.New("could not determine version from string: " + string(data))
 	}
-
-	select {
-	case value := <-returnChan:
-		parser := regexp.MustCompile(`VER:(\d+)-(\w+)-(\d+)`)
-		matches := parser.FindSubmatch(value)
-		if matches == nil {
-			return EndpointVersion{}, errors.New("could not determine version from string: " + string(value))
-		}
-		version := EndpointVersion{
-			Firmware: string(matches[1]),
-			Git:      string(matches[2]),
-			API:      string(matches[3]),
-		}
-		rpc.endpointVersion = version
-		return version, nil
-	case <-ctx.Done():
-		return EndpointVersion{}, ctx.Err()
+	version := EndpointVersion{
+		Firmware: string(matches[1]),
+		Git:      string(matches[2]),
+		API:      string(matches[3]),
 	}
+	rpc.endpointVersion = version
+	return version, nil
 }
