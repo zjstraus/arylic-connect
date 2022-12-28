@@ -1,9 +1,9 @@
 package main
 
-import "arylic-connect/websocketApi"
+import "arylic-connect/localWebsocketApi"
 
 func main() {
-	err := websocketApi.RunWebsocketServer()
+	err := localWebsocketApi.RunWebsocketServer()
 	if err != nil {
 		panic(err)
 	}

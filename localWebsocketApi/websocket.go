@@ -1,7 +1,7 @@
-package websocketApi
+package localWebsocketApi
 
 import (
-	"arylic-connect/websocketApi/serialmedia"
+	"arylic-connect/localWebsocketApi/serialmedia"
 	"github.com/ethereum/go-ethereum/rpc"
 	"net/http"
 )
