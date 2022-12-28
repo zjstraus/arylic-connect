@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-func (wrapper *SerialMediaWrapper) GetLED(ctx context.Context, target string) (bool, error) {
+func (wrapper *SerialMediaWrapper) GetInternet(ctx context.Context, target string) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -14,10 +14,10 @@ func (wrapper *SerialMediaWrapper) GetLED(ctx context.Context, target string) (b
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.GetLED(ctx)
+	return connection.GetInternet(ctx)
 }
 
-func (wrapper *SerialMediaWrapper) SetLED(ctx context.Context, target string, enable bool) (bool, error) {
+func (wrapper *SerialMediaWrapper) SetInternet(ctx context.Context, target string, enable bool) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -26,10 +26,10 @@ func (wrapper *SerialMediaWrapper) SetLED(ctx context.Context, target string, en
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.SetLED(ctx, enable)
+	return connection.SetInternet(ctx, enable)
 }
 
-func (wrapper *SerialMediaWrapper) ToggleLED(ctx context.Context, target string) (bool, error) {
+func (wrapper *SerialMediaWrapper) GetEthernet(ctx context.Context, target string) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -38,10 +38,10 @@ func (wrapper *SerialMediaWrapper) ToggleLED(ctx context.Context, target string)
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.ToggleLED(ctx)
+	return connection.GetEthernet(ctx)
 }
 
-func (wrapper *SerialMediaWrapper) GetBeep(ctx context.Context, target string) (bool, error) {
+func (wrapper *SerialMediaWrapper) SetEthernet(ctx context.Context, target string, enable bool) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -50,10 +50,10 @@ func (wrapper *SerialMediaWrapper) GetBeep(ctx context.Context, target string) (
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.GetBeep(ctx)
+	return connection.SetEthernet(ctx, enable)
 }
 
-func (wrapper *SerialMediaWrapper) SetBeep(ctx context.Context, target string, enable bool) (bool, error) {
+func (wrapper *SerialMediaWrapper) GetWifi(ctx context.Context, target string) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -62,34 +62,10 @@ func (wrapper *SerialMediaWrapper) SetBeep(ctx context.Context, target string, e
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.SetBeep(ctx, enable)
+	return connection.GetWifi(ctx)
 }
 
-func (wrapper *SerialMediaWrapper) GetName(ctx context.Context, target string) (string, error) {
-	wrapper.OpLock.RLock()
-	defer wrapper.OpLock.RUnlock()
-
-	connection, hasConnection := wrapper.SerialMediaCons[target]
-	if !hasConnection {
-		return "", errors.New("endpoint not found")
-	}
-
-	return connection.GetName(ctx)
-}
-
-func (wrapper *SerialMediaWrapper) SetName(ctx context.Context, target string, name string) (string, error) {
-	wrapper.OpLock.RLock()
-	defer wrapper.OpLock.RUnlock()
-
-	connection, hasConnection := wrapper.SerialMediaCons[target]
-	if !hasConnection {
-		return "", errors.New("endpoint not found")
-	}
-
-	return connection.SetName(ctx, name)
-}
-
-func (wrapper *SerialMediaWrapper) GetVoicePrompt(ctx context.Context, target string) (bool, error) {
+func (wrapper *SerialMediaWrapper) SetWifi(ctx context.Context, target string, enable bool) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -98,10 +74,22 @@ func (wrapper *SerialMediaWrapper) GetVoicePrompt(ctx context.Context, target st
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.GetVoicePrompt(ctx)
+	return connection.SetWifi(ctx, enable)
 }
 
-func (wrapper *SerialMediaWrapper) SetVoicePrompt(ctx context.Context, target string, enable bool) (bool, error) {
+func (wrapper *SerialMediaWrapper) RequestWifiReset(ctx context.Context, target string) error {
+	wrapper.OpLock.RLock()
+	defer wrapper.OpLock.RUnlock()
+
+	connection, hasConnection := wrapper.SerialMediaCons[target]
+	if !hasConnection {
+		return errors.New("endpoint not found")
+	}
+
+	return connection.RequestWifiReset(ctx)
+}
+
+func (wrapper *SerialMediaWrapper) GetBluetooth(ctx context.Context, target string) (bool, error) {
 	wrapper.OpLock.RLock()
 	defer wrapper.OpLock.RUnlock()
 
@@ -110,5 +98,29 @@ func (wrapper *SerialMediaWrapper) SetVoicePrompt(ctx context.Context, target st
 		return false, errors.New("endpoint not found")
 	}
 
-	return connection.SetVoicePrompt(ctx, enable)
+	return connection.GetBluetooth(ctx)
+}
+
+func (wrapper *SerialMediaWrapper) SetBluetooth(ctx context.Context, target string, enable bool) error {
+	wrapper.OpLock.RLock()
+	defer wrapper.OpLock.RUnlock()
+
+	connection, hasConnection := wrapper.SerialMediaCons[target]
+	if !hasConnection {
+		return errors.New("endpoint not found")
+	}
+
+	return connection.SetBluetooth(ctx, enable)
+}
+
+func (wrapper *SerialMediaWrapper) GetWifiPlayback(ctx context.Context, target string) (bool, error) {
+	wrapper.OpLock.RLock()
+	defer wrapper.OpLock.RUnlock()
+
+	connection, hasConnection := wrapper.SerialMediaCons[target]
+	if !hasConnection {
+		return false, errors.New("endpoint not found")
+	}
+
+	return connection.GetWifiPlayback(ctx)
 }
