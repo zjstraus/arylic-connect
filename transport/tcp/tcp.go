@@ -73,3 +73,10 @@ func (t *Transport) Close() error {
 func (t *Transport) Flavor() transport.InterfaceFlavor {
 	return transport.Flavor_TCP
 }
+
+func (t *Transport) Target() string {
+	if t.conn == nil {
+		return ""
+	}
+	return t.conn.RemoteAddr().String()
+}

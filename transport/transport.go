@@ -33,4 +33,5 @@ type AsyncLine interface {
 	SendMessage(ctx context.Context, message string) error
 	Flavor() InterfaceFlavor
 	Close() error
+	Target() string
 }

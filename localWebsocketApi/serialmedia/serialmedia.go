@@ -65,3 +65,23 @@ func (wrapper *SerialMediaWrapper) ConnectEndpoint(target string) (string, error
 
 	return name, nil
 }
+
+type EndpointInfo struct {
+	Name   string
+	Target string
+}
+
+func (wrapper *SerialMediaWrapper) ConnectedEndpoints() []EndpointInfo {
+	wrapper.OpLock.RLock()
+	defer wrapper.OpLock.RUnlock()
+	endpoints := make([]EndpointInfo, 0)
+
+	for name, endpoint := range wrapper.SerialMediaCons {
+		endpoints = append(endpoints, EndpointInfo{
+			Name:   name,
+			Target: endpoint.TransportTarget(),
+		})
+	}
+
+	return endpoints
+}

@@ -35,3 +35,10 @@ func (rpc *RPC) Close() error {
 	}
 	return nil
 }
+
+func (rpc *RPC) TransportTarget() string {
+	if rpc.transport == nil {
+		return ""
+	}
+	return rpc.transport.Target()
+}

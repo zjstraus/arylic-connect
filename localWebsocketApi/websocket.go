@@ -21,18 +21,76 @@ package localWebsocketApi
 import (
 	"arylic-connect/localWebsocketApi/serialmedia"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/koron/go-ssdp"
+	"log"
 	"net/http"
+	"net/url"
+	"time"
 )
 
-func RunWebsocketServer() error {
-	serialMediaService := serialmedia.New()
+type WebsocketManager struct {
+	serialConnections *serialmedia.SerialMediaWrapper
+}
 
+func (manager *WebsocketManager) discoverSsdp() {
+	ssdpList, ssdpErr := ssdp.Search(ssdp.All, 5, "")
+	if ssdpErr != nil {
+		panic(ssdpErr)
+	}
+	knownEndpoints := manager.serialConnections.ConnectedEndpoints()
+	for _, service := range ssdpList {
+		if service.Type != "urn:schemas-wiimu-com:service:PlayQueue:1" {
+			continue
+		}
+		parsedUrl, urlErr := url.Parse(service.Location)
+		if urlErr == nil {
+			targetAddr := parsedUrl.Hostname() + ":8899"
+			alreadyConnected := false
+			for _, endpoint := range knownEndpoints {
+				if endpoint.Target == targetAddr {
+					alreadyConnected = true
+					break
+				}
+			}
+			if !alreadyConnected {
+				log.Printf("Discovered potential device at %s\n", parsedUrl.Hostname())
+				name, connectErr := manager.serialConnections.ConnectEndpoint(targetAddr)
+				if connectErr == nil {
+					log.Printf("TCP connected to player %s\n", name)
+				}
+			}
+		}
+	}
+}
+
+func (manager *WebsocketManager) ssdpLoop() {
+	ticker := time.NewTicker(time.Minute)
+	manager.discoverSsdp()
+	for {
+		select {
+		case <-ticker.C:
+			manager.discoverSsdp()
+		}
+	}
+}
+
+func (manager *WebsocketManager) wsRpcLoop() error {
 	rpcServer := rpc.NewServer()
-	serialMediaErr := rpcServer.RegisterName("serialmedia", serialMediaService)
+	serialMediaErr := rpcServer.RegisterName("serialmedia", manager.serialConnections)
 	if serialMediaErr != nil {
 		panic(serialMediaErr)
 	}
 
 	http.Handle("/ws", rpcServer.WebsocketHandler([]string{"*"}))
+	log.Println("Starting web server")
 	return http.ListenAndServe(":8080", nil)
+}
+
+func RunWebsocketServer() error {
+	manager := WebsocketManager{
+		serialConnections: serialmedia.New(),
+	}
+
+	go manager.ssdpLoop()
+	return manager.wsRpcLoop()
 }
