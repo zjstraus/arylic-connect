@@ -81,6 +81,8 @@ func (manager *WebsocketManager) wsRpcLoop() error {
 		panic(serialMediaErr)
 	}
 
+	uiDist := http.FileServer(http.Dir("localWebUi/dist"))
+	http.Handle("/", uiDist)
 	http.Handle("/ws", rpcServer.WebsocketHandler([]string{"*"}))
 	log.Println("Starting web server")
 	return http.ListenAndServe(":8080", nil)
