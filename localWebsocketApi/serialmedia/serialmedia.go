@@ -22,6 +22,7 @@ import (
 	"arylic-connect/rpcWrapper/serialMediaControl"
 	"arylic-connect/transport/tcp"
 	"context"
+	"log"
 	"sync"
 	"time"
 )
@@ -57,7 +58,10 @@ func (wrapper *SerialMediaWrapper) ConnectEndpoint(target string) (string, error
 
 	existingEndpoint, hasEndpoint := wrapper.SerialMediaCons[name]
 	if hasEndpoint {
-		existingEndpoint.Close()
+		closeErr := existingEndpoint.Close()
+		if closeErr != nil {
+			log.Printf("Error closing existing endpoint connection for %s: %s\n", name, closeErr)
+		}
 		delete(wrapper.SerialMediaCons, name)
 	}
 

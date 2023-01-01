@@ -75,8 +75,10 @@ func (rpc *RPC) GetStatus(ctx context.Context) (EndpointStatus, error) {
 	entries := strings.Split(string(matches[1]), ",")
 
 	if len(entries) >= 1 {
-		status.Source.unmarshalApiText([]byte(entries[0]))
-		status.ValidValues = append(status.ValidValues, "Source")
+		sourceParseErr := status.Source.unmarshalApiText([]byte(entries[0]))
+		if sourceParseErr == nil {
+			status.ValidValues = append(status.ValidValues, "Source")
+		}
 	}
 	if len(entries) >= 2 {
 		status.Mute = entries[1] == "1"

@@ -48,7 +48,10 @@ func New() (*Transport, error) {
 }
 
 func (t *Transport) Connect(target string) error {
-	t.Close()
+	closeErr := t.Close()
+	if closeErr != nil {
+		return closeErr
+	}
 
 	t.listenerCloser = make(chan int)
 	t.outgoingQueue = make(chan string)

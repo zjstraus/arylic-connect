@@ -80,7 +80,10 @@ func (t *Transport) readMessage(timeout time.Duration) ([]byte, error) {
 		return nil, errors.New("t not connected")
 	}
 
-	t.conn.SetReadDeadline(time.Now().Add(timeout))
+	deadlineErr := t.conn.SetReadDeadline(time.Now().Add(timeout))
+	if deadlineErr != nil {
+		return nil, deadlineErr
+	}
 
 	// Read in until we match the whole fixed start of message sequence
 	currentStartSequenceIndex := 0
