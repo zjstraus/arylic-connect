@@ -28,6 +28,8 @@ import (
 	"strings"
 )
 
+// SetLED requests the device enable/disable any LEDs and returns the
+// result state.
 func (rpc *RPC) SetLED(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -55,6 +57,7 @@ func (rpc *RPC) SetLED(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetLED queries the device to see if LEDs are enabled
 func (rpc *RPC) GetLED(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -78,6 +81,7 @@ func (rpc *RPC) GetLED(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// ToggleLED inverts the devices current LED enabled state and returns it.
 func (rpc *RPC) ToggleLED(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -101,6 +105,8 @@ func (rpc *RPC) ToggleLED(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// SetBeep requests the device enable/disable audible feedback when
+// physical controls are used and returns the result state.
 func (rpc *RPC) SetBeep(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -128,6 +134,7 @@ func (rpc *RPC) SetBeep(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetBeep queries the device to see if audible feedback is enabled.
 func (rpc *RPC) GetBeep(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -151,6 +158,7 @@ func (rpc *RPC) GetBeep(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetName queries the device for its name.
 func (rpc *RPC) GetName(ctx context.Context) (string, error) {
 	request := ""
 	replyPrefix := ""
@@ -179,6 +187,8 @@ func (rpc *RPC) GetName(ctx context.Context) (string, error) {
 	return string(decodedHex), nil
 }
 
+// SetName requests the device change its name and returns the result
+// state.
 func (rpc *RPC) SetName(ctx context.Context, name string) (string, error) {
 	encoded := hex.EncodeToString([]byte(name))
 	encoded = strings.ToUpper(encoded)
@@ -209,6 +219,8 @@ func (rpc *RPC) SetName(ctx context.Context, name string) (string, error) {
 	return string(decodedHex), nil
 }
 
+// SetVoicePrompt requests the device enable/disable any voice
+// prompts and returns the result state.
 func (rpc *RPC) SetVoicePrompt(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -236,6 +248,7 @@ func (rpc *RPC) SetVoicePrompt(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetVoicePrompt queries the device to see if voice prompts are enabled
 func (rpc *RPC) GetVoicePrompt(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""

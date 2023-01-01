@@ -26,6 +26,7 @@ import (
 	"regexp"
 )
 
+// GetInternet queries if the device has an internet connection.
 func (rpc *RPC) GetInternet(ctx context.Context) (bool, error) {
 	if rpc.transport == nil {
 		return false, rpcWrapper.ErrTransportNotConnected
@@ -65,6 +66,8 @@ func (rpc *RPC) GetInternet(ctx context.Context) (bool, error) {
 	}
 }
 
+// SetInternet requests the device enable/disable its internet access and
+// returns the result state.
 func (rpc *RPC) SetInternet(ctx context.Context, state bool) (bool, error) {
 	if rpc.transport == nil {
 		return false, rpcWrapper.ErrTransportNotConnected
@@ -108,6 +111,7 @@ func (rpc *RPC) SetInternet(ctx context.Context, state bool) (bool, error) {
 	}
 }
 
+// GetEthernet queries if the device has an ethernet connection.
 func (rpc *RPC) GetEthernet(ctx context.Context) (bool, error) {
 	if rpc.transport == nil {
 		return false, rpcWrapper.ErrTransportNotConnected
@@ -147,6 +151,8 @@ func (rpc *RPC) GetEthernet(ctx context.Context) (bool, error) {
 	}
 }
 
+// SetEthernet requests the device enable/disable its ethernet connection and
+// returns the result state.
 func (rpc *RPC) SetEthernet(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -173,6 +179,7 @@ func (rpc *RPC) SetEthernet(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetWifi queries if the device has an wifi connection.
 func (rpc *RPC) GetWifi(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -199,6 +206,8 @@ func (rpc *RPC) GetWifi(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// SetWifi requests the device enable/disable its wifi connection and
+// returns the result state.
 func (rpc *RPC) SetWifi(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -226,6 +235,7 @@ func (rpc *RPC) SetWifi(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// RequestWifiReset requests the device restart its wifi stack.
 func (rpc *RPC) RequestWifiReset(ctx context.Context) error {
 	if rpc.transport == nil {
 		return rpcWrapper.ErrTransportNotConnected
@@ -244,6 +254,7 @@ func (rpc *RPC) RequestWifiReset(ctx context.Context) error {
 	return rpc.transport.SendMessage(ctx, request)
 }
 
+// GetBluetooth queries if the device has a bluetooth connection.
 func (rpc *RPC) GetBluetooth(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -267,6 +278,8 @@ func (rpc *RPC) GetBluetooth(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// SetBluetooth requests the device enable/disable its bluetooth connection and
+// returns the result state.
 func (rpc *RPC) SetBluetooth(ctx context.Context, state bool) error {
 	if rpc.transport == nil {
 		return rpcWrapper.ErrTransportNotConnected

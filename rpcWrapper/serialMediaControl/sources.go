@@ -164,6 +164,7 @@ func (source *InputSource) unmarshalApiText(text []byte) error {
 	return nil
 }
 
+// GetSource queries the device for its current active source.
 func (rpc *RPC) GetSource(ctx context.Context) (InputSource, error) {
 	request := ""
 	replyPrefix := ""
@@ -188,6 +189,10 @@ func (rpc *RPC) GetSource(ctx context.Context) (InputSource, error) {
 	return source, source.unmarshalApiText(matches[1])
 }
 
+// SetSource requests the device change its active source and returns
+// the result.
+//
+// Input_None is not a valid source for use here.
 func (rpc *RPC) SetSource(ctx context.Context, targetSource InputSource) (InputSource, error) {
 	request := ""
 	replyPrefix := ""
@@ -216,6 +221,11 @@ func (rpc *RPC) SetSource(ctx context.Context, targetSource InputSource) (InputS
 	return source, source.unmarshalApiText(matches[1])
 }
 
+// GetDefaultSource queries the device for what source will be
+// active at power on, if any.
+//
+// A setting of Input_None signals that the device will power on to
+// whatever source it had last.
 func (rpc *RPC) GetDefaultSource(ctx context.Context) (InputSource, error) {
 	request := ""
 	replyPrefix := ""
@@ -240,6 +250,11 @@ func (rpc *RPC) GetDefaultSource(ctx context.Context) (InputSource, error) {
 	return source, source.unmarshalApiText(matches[1])
 }
 
+// SetDefaultSource requests the device update what source will be
+// active at power on, if any and returns the result.
+//
+// A setting of Input_None signals that the device will power on to
+// whatever source it had last.
 func (rpc *RPC) SetDefaultSource(ctx context.Context, targetSource InputSource) (InputSource, error) {
 	request := ""
 	replyPrefix := ""
@@ -268,6 +283,8 @@ func (rpc *RPC) SetDefaultSource(ctx context.Context, targetSource InputSource) 
 	return source, source.unmarshalApiText(matches[1])
 }
 
+// GetInputAutoswitch queries the device to see if automatically
+// switching to new valid inputs is enabled.
 func (rpc *RPC) GetInputAutoswitch(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -291,6 +308,8 @@ func (rpc *RPC) GetInputAutoswitch(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// SetInputAutoswitch requests the device change if automatic
+// switching is enabled and returns the result.
 func (rpc *RPC) SetInputAutoswitch(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""

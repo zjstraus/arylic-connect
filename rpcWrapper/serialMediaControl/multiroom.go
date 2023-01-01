@@ -25,12 +25,14 @@ import (
 	"regexp"
 )
 
+// MultiroomMode is an enum for the potential states of a player in a multiroom
+// system.
 type MultiroomMode int
 
 const (
-	Mode_None MultiroomMode = iota
-	Mode_Master
-	Mode_Slave
+	Mode_None   MultiroomMode = iota // Player is not in a multiroom group
+	Mode_Master                      // Player is the master in a group
+	Mode_Slave                       // Player is a slave in a group
 )
 
 func (mode MultiroomMode) MarshalText() ([]byte, error) {
@@ -157,6 +159,7 @@ func (channel *ChannelConfig) unmarshalApiText(text []byte) error {
 	return nil
 }
 
+// GetMultiroomMode queries the device for its current role in a multiroom group.
 func (rpc *RPC) GetMultiroomMode(ctx context.Context) (MultiroomMode, error) {
 	request := ""
 	replyPrefix := ""
@@ -181,6 +184,7 @@ func (rpc *RPC) GetMultiroomMode(ctx context.Context) (MultiroomMode, error) {
 	return mode, mode.unmarshalApiText(matches[1])
 }
 
+// GetChannelConfig queries the device for its mode.
 func (rpc *RPC) GetChannelConfig(ctx context.Context) (ChannelConfig, error) {
 	request := ""
 	replyPrefix := ""
@@ -205,6 +209,8 @@ func (rpc *RPC) GetChannelConfig(ctx context.Context) (ChannelConfig, error) {
 	return mode, mode.unmarshalApiText(matches[1])
 }
 
+// SetVolumeSync requests the device to set if it follows the group for volume
+// changes and returns the result state.
 func (rpc *RPC) SetVolumeSync(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -232,6 +238,8 @@ func (rpc *RPC) SetVolumeSync(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetVolumeSync queries the device if it is following the group for volume
+// updates.
 func (rpc *RPC) GetVolumeSync(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""

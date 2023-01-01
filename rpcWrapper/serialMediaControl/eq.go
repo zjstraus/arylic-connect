@@ -27,6 +27,9 @@ import (
 	"strconv"
 )
 
+// GetBass queries the connected device for its current bass EQ setting.
+//
+// Value will be in the range of [-1,1] with a granularity of 0.1
 func (rpc *RPC) GetBass(ctx context.Context) (float32, error) {
 	request := ""
 	replyPrefix := ""
@@ -57,6 +60,10 @@ func (rpc *RPC) GetBass(ctx context.Context) (float32, error) {
 	return floatCast / 10, nil
 }
 
+// SetBass requests the connected device change its bass EQ setting and
+// returns the result.
+//
+// Value will be in the range of [-1,1] with a granularity of 0.1
 func (rpc *RPC) SetBass(ctx context.Context, state float32) (float32, error) {
 	request := ""
 	replyPrefix := ""
@@ -86,6 +93,9 @@ func (rpc *RPC) SetBass(ctx context.Context, state float32) (float32, error) {
 	return floatCast / 10, nil
 }
 
+// GetTreble queries the connected device for its current treble EQ setting.
+//
+// Value will be in the range of [-1,1] with a granularity of 0.1
 func (rpc *RPC) GetTreble(ctx context.Context) (float32, error) {
 	request := ""
 	replyPrefix := ""
@@ -116,6 +126,10 @@ func (rpc *RPC) GetTreble(ctx context.Context) (float32, error) {
 	return floatCast / 10, nil
 }
 
+// SetTreble requests the connected device change its treble EQ setting and
+// returns the result.
+//
+// Value will be in the range of [-1,1] with a granularity of 0.1
 func (rpc *RPC) SetTreble(ctx context.Context, state float32) (float32, error) {
 	request := ""
 	replyPrefix := ""
@@ -145,6 +159,8 @@ func (rpc *RPC) SetTreble(ctx context.Context, state float32) (float32, error) {
 	return floatCast / 10, nil
 }
 
+// SetVirtualBass requests the connected device change the state of its virtual
+// bass booster and returns the result state.
 func (rpc *RPC) SetVirtualBass(ctx context.Context, state bool) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -172,6 +188,8 @@ func (rpc *RPC) SetVirtualBass(ctx context.Context, state bool) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// GetVirtualBass queries the connected device for the state of its virtual
+// bass booster.
 func (rpc *RPC) GetVirtualBass(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""
@@ -195,6 +213,8 @@ func (rpc *RPC) GetVirtualBass(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
+// ToggleVirtualBass requests the connected device invert the state of its virtual
+// bass booster and returns the result.
 func (rpc *RPC) ToggleVirtualBass(ctx context.Context) (bool, error) {
 	request := ""
 	replyPrefix := ""

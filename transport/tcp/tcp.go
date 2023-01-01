@@ -25,6 +25,8 @@ import (
 	"time"
 )
 
+// Transport is an AsyncLine implementation using a TCP stream encapsulated in a
+// tunneling protocol to be proxied by the device's Linkplay module.
 type Transport struct {
 	conn net.Conn
 
@@ -33,6 +35,8 @@ type Transport struct {
 	persistentRequests map[string][]chan<- []byte
 	oneshotRequests    map[string][]chan<- []byte
 
+	// use an unbuffered channel to queue up commands to enable the context-aware
+	// sending, as sending to a channel is cancel-able, unlike the socket write
 	outgoingQueue chan string
 }
 

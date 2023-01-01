@@ -28,6 +28,10 @@ import (
 	"strings"
 )
 
+// EndpointStatus is a large struct the API returns all at once. It
+// has a lot of entries and a vague definition of what's included
+// at what API levels, so it also includes a slice of field names
+// to show what items were parsed.
 type EndpointStatus struct {
 	Source      InputSource
 	Mute        bool
@@ -42,6 +46,7 @@ type EndpointStatus struct {
 	ValidValues []string
 }
 
+// GetStatus queries the device for its current status summary.
 func (rpc *RPC) GetStatus(ctx context.Context) (EndpointStatus, error) {
 	status := EndpointStatus{}
 

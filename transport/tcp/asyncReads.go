@@ -25,6 +25,8 @@ import (
 	"time"
 )
 
+// asyncReadLoop spins off a new thread to wait for messages to come in, match
+// them against any active readers, and forward them on.
 func (t *Transport) asyncReadLoop() {
 	scopedCloser := make(chan int)
 	go func() {

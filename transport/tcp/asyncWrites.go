@@ -24,6 +24,10 @@ import (
 	"time"
 )
 
+// asyncWriteLoop picks an item off the outgoingQueue and puts it on the wire.
+//
+// The API spec calls out a minimum 200ms between commands, so the send leg
+// contains a 200ms sleep before looping back for the next potential item.
 func (t *Transport) asyncWriteLoop() {
 	for {
 		select {
@@ -39,6 +43,9 @@ func (t *Transport) asyncWriteLoop() {
 	}
 }
 
+// SendMessage queues an item to be sent out. This is safe to be called from
+// multiple threads as the internal queue keeps the connection clean and allows
+// for aborting the context if required.
 func (t *Transport) SendMessage(ctx context.Context, message string) error {
 	select {
 	case t.outgoingQueue <- message:
