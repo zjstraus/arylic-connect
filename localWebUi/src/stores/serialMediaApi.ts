@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import {defineStore} from "pinia";
 import {useWebsocketStore} from "@/stores/baseWebsocket";
 import {ref} from "vue";
+import {throttle} from "lodash";
 
 interface serialmediaEndpointVersion {
     Git: string,
@@ -42,10 +43,18 @@ export const useSerialMediaApi = defineStore("serialMediaApi", () => {
         endpointVersion.value = await ws.client.call("serialmedia_getVersion", [activePlayer.value]) as serialmediaEndpointVersion
     }
 
+    const throttledCalls: { [key: string]: Function } = {}
+
     async function makeCall(submethod: string, params: any[]) {
         await ws.connect()
+        if (! (submethod in throttledCalls)) {
+            throttledCalls[submethod] = throttle((params: any[]) => {
+                return ws.client.call("serialmedia_" + submethod, params)
+            }, 200)
+        }
         params.unshift(activePlayer.value)
-        return ws.client.call("serialmedia_" + submethod, params)
+        return throttledCalls[submethod](params)
+        //return ws.client.call("serialmedia_" + submethod, params)
     }
 
 

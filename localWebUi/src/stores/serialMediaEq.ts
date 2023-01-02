@@ -25,25 +25,26 @@ export const useSerialMediaApiEq = defineStore("serialMediaApiEq", () => {
     const api = useSerialMediaApi()
 
     const bass = ref(0)
-    watch(bass, async (level) => {
-        bass.value = await api.makeCall("setBass", [level]) as number
-    })
+
+    async function sendBass() {
+        bass.value = await api.makeCall("setBass", [bass.value]) as number
+    }
     async function pollBass() {
         bass.value = await api.makeCall("getBass", []) as number
     }
 
     const treble = ref(0)
-    watch(treble, async (level) => {
-        treble.value = await api.makeCall("setTreble", [level]) as number
-    })
+    async function sendTreble() {
+        treble.value = await api.makeCall("setTreble", [treble.value]) as number
+    }
     async function pollTreble() {
         treble.value = await api.makeCall("getTreble", []) as number
     }
 
     const virtualBass = ref(false)
-    watch(virtualBass, async(enabled) => {
-        virtualBass.value = await api.makeCall("setVirtualBass", [enabled]) as boolean
-    })
+    async function sendVirtualBass(){
+        virtualBass.value = await api.makeCall("setVirtualBass", [virtualBass.value]) as boolean
+    }
     async function pollVirtualBass() {
         virtualBass.value = await api.makeCall("getVirtualBass", []) as boolean
     }
@@ -56,5 +57,16 @@ export const useSerialMediaApiEq = defineStore("serialMediaApiEq", () => {
         ])
     }
 
-    return {bass, treble, virtualBass, pollBass, pollTreble, pollVirtualBass, pollAll}
+    async function sendAll() {
+        return Promise.all([
+            sendTreble(),
+            sendBass(),
+            sendVirtualBass()
+        ])
+    }
+
+    return {bass, treble, virtualBass,
+        pollBass, pollTreble, pollVirtualBass,
+        sendBass, sendTreble, sendVirtualBass,
+        sendAll, pollAll}
 })

@@ -19,9 +19,9 @@
     <v-card-title>EQ</v-card-title>
     <v-card-item>
     <v-form>
-    <v-slider label="Treble" v-model="treble" min="-1" max="1" step="0.1"></v-slider>
-    <v-slider label="Bass" v-model="bass" min="-1" max="1" step="0.1"></v-slider>
-    <v-switch label="Virtual Bass" v-model="virtualBass" color="primary" inset></v-switch>
+    <v-slider label="Treble" v-model="treble" min="-1" max="1" step="0.1" v-on:update:modelValue="sendTreble"></v-slider>
+    <v-slider label="Bass" v-model="bass" min="-1" max="1" step="0.1" v-on:update:modelValue="sendBass"></v-slider>
+    <v-switch label="Virtual Bass" v-model="virtualBass" color="primary" v-on:update:modelValue="sendVirtualBass" inset></v-switch>
     </v-form>
     </v-card-item>
   </v-card>
@@ -33,7 +33,7 @@ import {storeToRefs} from "pinia";
 import {useSerialMediaApiEq} from "@/stores/serialMediaEq";
 import {useSerialMediaApi} from "@/stores/serialMediaApi";
 
-const {pollAll} = useSerialMediaApiEq()
+const {pollAll, sendTreble, sendBass, sendVirtualBass} = useSerialMediaApiEq()
 
 const {bass, treble, virtualBass} = storeToRefs(useSerialMediaApiEq())
 

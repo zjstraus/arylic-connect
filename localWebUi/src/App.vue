@@ -70,7 +70,7 @@ function setActivePlayer() {
         <v-combobox
             label="player"
             v-model="activePlayer"
-            @change="setActivePlayer"
+            @update:modelValue="setActivePlayer"
             :items="endpointNames"
         ></v-combobox>
       </v-list-item>
