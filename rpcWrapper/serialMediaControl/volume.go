@@ -290,7 +290,7 @@ func (rpc *RPC) GetBalance(ctx context.Context) (float32, error) {
 		return 0, reqErr
 	}
 
-	parser := regexp.MustCompile(`BAL:(\d+)&`)
+	parser := regexp.MustCompile(`BAL:(-?\d+)&`)
 	matches := parser.FindSubmatch(data)
 	if matches == nil {
 		return 0, errors.New("could not determine volume from string: " + string(data))
@@ -306,13 +306,13 @@ func (rpc *RPC) GetBalance(ctx context.Context) (float32, error) {
 
 	floatCast := float32(parsed)
 
-	return (floatCast / 100) - 1, nil
+	return floatCast / 100, nil
 }
 
 func (rpc *RPC) SetBalance(ctx context.Context, state float32) (float32, error) {
 	request := ""
 	replyPrefix := ""
-	formattedState := int((state + 1) * 100)
+	formattedState := int(state * 100)
 	switch rpc.transport.Flavor() {
 	case transport.Flavor_TCP:
 		request = fmt.Sprintf("MCU+PAS+RAKOIT:BAL:%d&", formattedState)
@@ -324,7 +324,7 @@ func (rpc *RPC) SetBalance(ctx context.Context, state float32) (float32, error) 
 		return 0, reqErr
 	}
 
-	parser := regexp.MustCompile(`BAL:(\d+)&`)
+	parser := regexp.MustCompile(`BAL:(-?\d+)&`)
 	matches := parser.FindSubmatch(data)
 	if matches == nil {
 		return 0, errors.New("could not determine volume from string: " + string(data))
@@ -336,5 +336,5 @@ func (rpc *RPC) SetBalance(ctx context.Context, state float32) (float32, error) 
 
 	floatCast := float32(parsed)
 
-	return (floatCast / 100) - 1, nil
+	return floatCast / 100, nil
 }
