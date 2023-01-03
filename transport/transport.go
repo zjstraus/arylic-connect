@@ -49,7 +49,10 @@ type AsyncLine interface {
 
 	// RegisterOneshotReader sets up a channel to receive a message off the line
 	// the first time a given prefix is received.
-	RegisterOneshotReader(prefix string, channel chan<- []byte)
+	// Returns true if there was already at least one reader queued for that prefix
+	RegisterOneshotReader(prefix string, channel chan<- []byte) bool
+
+	SendMessageAtomic(ctx context.Context, message string, prefix string, outchan chan<- []byte) error
 
 	// SendMessage puts a message out on the connection.
 	SendMessage(ctx context.Context, message string) error

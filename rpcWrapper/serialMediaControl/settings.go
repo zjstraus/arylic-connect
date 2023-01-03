@@ -43,7 +43,7 @@ func (rpc *RPC) SetLED(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:LED:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -91,7 +91,7 @@ func (rpc *RPC) ToggleLED(ctx context.Context) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:LED:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -120,7 +120,7 @@ func (rpc *RPC) SetBeep(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:BEP:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -200,7 +200,7 @@ func (rpc *RPC) SetName(ctx context.Context, name string) (string, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:NAM:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return "", reqErr
 	}
@@ -234,7 +234,7 @@ func (rpc *RPC) SetVoicePrompt(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:PMT:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}

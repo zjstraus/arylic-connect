@@ -224,7 +224,7 @@ func (rpc *RPC) SetVolumeSync(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VOS:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}

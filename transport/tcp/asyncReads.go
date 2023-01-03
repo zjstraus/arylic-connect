@@ -93,11 +93,13 @@ func (t *Transport) RegisterPersistentReader(prefix string, channel chan<- []byt
 	t.persistentRequests[prefix] = currentListeners
 }
 
-func (t *Transport) RegisterOneshotReader(prefix string, channel chan<- []byte) {
+func (t *Transport) RegisterOneshotReader(prefix string, channel chan<- []byte) bool {
 	t.requestLocker.Lock()
 	defer t.requestLocker.Unlock()
 
 	currentListeners := t.oneshotRequests[prefix]
+	listenerLength := len(currentListeners)
 	currentListeners = append(currentListeners, channel)
 	t.oneshotRequests[prefix] = currentListeners
+	return listenerLength > 0
 }

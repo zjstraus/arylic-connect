@@ -74,7 +74,7 @@ func (rpc *RPC) SetBass(ctx context.Context, state float32) (float32, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:BAS:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return 0, reqErr
 	}
@@ -140,7 +140,7 @@ func (rpc *RPC) SetTreble(ctx context.Context, state float32) (float32, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:TRE:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return 0, reqErr
 	}
@@ -174,7 +174,7 @@ func (rpc *RPC) SetVirtualBass(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VBS:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -224,7 +224,7 @@ func (rpc *RPC) ToggleVirtualBass(ctx context.Context) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VBS:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}

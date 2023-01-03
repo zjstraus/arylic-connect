@@ -33,6 +33,13 @@ func (t *Transport) asyncWriteLoop() {
 		select {
 		case <-t.listenerCloser:
 			return
+		case atomicMsg := <-t.atomicOutgoingQueue:
+			t.RegisterOneshotReader(atomicMsg.listenPrefix, atomicMsg.outchan)
+			err := t.writeMessage(atomicMsg.outMessage)
+			if err != nil {
+				log.Println(err.Error())
+			}
+			time.Sleep(200 * time.Millisecond)
 		case msg := <-t.outgoingQueue:
 			err := t.writeMessage(msg)
 			if err != nil {
@@ -49,6 +56,21 @@ func (t *Transport) asyncWriteLoop() {
 func (t *Transport) SendMessage(ctx context.Context, message string) error {
 	select {
 	case t.outgoingQueue <- message:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (t *Transport) SendMessageAtomic(ctx context.Context, message string, prefix string, outchan chan<- []byte) error {
+	wrapped := atomicListenerPair{
+		ctx:          ctx,
+		listenPrefix: prefix,
+		outMessage:   message,
+		outchan:      outchan,
+	}
+	select {
+	case t.atomicOutgoingQueue <- wrapped:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()

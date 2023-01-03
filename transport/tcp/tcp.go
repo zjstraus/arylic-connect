@@ -20,10 +20,18 @@ package tcp
 
 import (
 	"arylic-connect/transport"
+	"context"
 	"net"
 	"sync"
 	"time"
 )
+
+type atomicListenerPair struct {
+	ctx          context.Context
+	listenPrefix string
+	outMessage   string
+	outchan      chan<- []byte
+}
 
 // Transport is an AsyncLine implementation using a TCP stream encapsulated in a
 // tunneling protocol to be proxied by the device's Linkplay module.
@@ -38,12 +46,15 @@ type Transport struct {
 	// use an unbuffered channel to queue up commands to enable the context-aware
 	// sending, as sending to a channel is cancel-able, unlike the socket write
 	outgoingQueue chan string
+
+	atomicOutgoingQueue chan atomicListenerPair
 }
 
 func New() (*Transport, error) {
 	return &Transport{
-		persistentRequests: make(map[string][]chan<- []byte),
-		oneshotRequests:    make(map[string][]chan<- []byte),
+		persistentRequests:  make(map[string][]chan<- []byte),
+		oneshotRequests:     make(map[string][]chan<- []byte),
+		atomicOutgoingQueue: make(chan atomicListenerPair),
 	}, nil
 }
 

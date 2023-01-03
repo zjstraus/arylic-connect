@@ -70,7 +70,7 @@ func (rpc *RPC) SetVolume(ctx context.Context, state float32) (float32, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VOL:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return 0, reqErr
 	}
@@ -103,7 +103,7 @@ func (rpc *RPC) SetMute(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:MUT:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -176,7 +176,7 @@ func (rpc *RPC) SetFixedVolume(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:VOF:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -256,7 +256,7 @@ func (rpc *RPC) SetMaxVolume(ctx context.Context, state float32) (float32, error
 		replyPrefix = "MCU+PAS+RAKOIT:MXV:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return 0, reqErr
 	}
@@ -319,7 +319,7 @@ func (rpc *RPC) SetBalance(ctx context.Context, state float32) (float32, error) 
 		replyPrefix = "MCU+PAS+RAKOIT:BAL:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return 0, reqErr
 	}

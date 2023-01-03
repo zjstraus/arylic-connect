@@ -206,7 +206,7 @@ func (rpc *RPC) SetSource(ctx context.Context, targetSource InputSource) (InputS
 		replyPrefix = "MCU+PAS+RAKOIT:SRC:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return Input_Unknown, reqErr
 	}
@@ -268,7 +268,7 @@ func (rpc *RPC) SetDefaultSource(ctx context.Context, targetSource InputSource) 
 		replyPrefix = "MCU+PAS+RAKOIT:POM:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return Input_Unknown, reqErr
 	}
@@ -323,7 +323,7 @@ func (rpc *RPC) SetInputAutoswitch(ctx context.Context, state bool) (bool, error
 		replyPrefix = "MCU+PAS+RAKOIT:ASW:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}

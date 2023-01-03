@@ -166,7 +166,7 @@ func (rpc *RPC) SetEthernet(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:ETH:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -221,7 +221,7 @@ func (rpc *RPC) SetWifi(ctx context.Context, state bool) (bool, error) {
 		replyPrefix = "MCU+PAS+RAKOIT:WIF:"
 	}
 
-	data, reqErr := requestWithResponse(ctx, rpc.transport, request, replyPrefix)
+	data, reqErr := atomicRequestWithResponse(ctx, rpc.transport, request, replyPrefix)
 	if reqErr != nil {
 		return false, reqErr
 	}
@@ -278,8 +278,7 @@ func (rpc *RPC) GetBluetooth(ctx context.Context) (bool, error) {
 	return string(matches[1]) == "1", nil
 }
 
-// SetBluetooth requests the device enable/disable its bluetooth connection and
-// returns the result state.
+// SetBluetooth requests the device enable/disable its bluetooth connection
 func (rpc *RPC) SetBluetooth(ctx context.Context, state bool) error {
 	if rpc.transport == nil {
 		return rpcWrapper.ErrTransportNotConnected
