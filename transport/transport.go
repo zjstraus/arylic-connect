@@ -20,7 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // multiple connection mechanisms.
 package transport
 
-import "context"
+import (
+	"context"
+)
 
 // InterfaceFlavor is an enum used to differentiate which interface implementation
 // is in use, as commands take different forms between connection types.
@@ -28,6 +30,7 @@ type InterfaceFlavor int
 
 const (
 	Flavor_TCP InterfaceFlavor = iota // UART over a TCP connection to a Linkplay module
+	Flavor_HTTP
 )
 
 // AsyncLine is an interface for a family of connections using a string request -
@@ -64,5 +67,16 @@ type AsyncLine interface {
 	Close() error
 
 	// Target returns the connection target string.
+	Target() string
+}
+
+type HTTP interface {
+	Connect(target string) error
+
+	MakeRequest(ctx context.Context, command string, params ...string) ([]byte, error)
+
+	Flavor() InterfaceFlavor
+
+	Close() error
 	Target() string
 }
