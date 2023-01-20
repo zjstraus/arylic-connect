@@ -228,3 +228,53 @@ func (rpc *RPC) MuteChannel(ctx context.Context) <-chan bool {
 
 	return outputChan
 }
+
+func (rpc *RPC) PlayChannel(ctx context.Context) <-chan bool {
+	replyPrefix := ""
+	switch rpc.transport.Flavor() {
+	case transport.Flavor_TCP:
+		replyPrefix = "AXX+PLY+"
+	}
+
+	outputChan := make(chan bool)
+	inputChan := make(chan []byte)
+	rpc.transport.RegisterPersistentReader(replyPrefix, inputChan)
+
+	go func() {
+		defer func() {
+			rpc.transport.UnregisterPersistentReader(replyPrefix, inputChan)
+			close(outputChan)
+			close(inputChan)
+		}()
+
+		parser := regexp.MustCompile(`PLY\+(\d+)`)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case input := <-inputChan:
+				matches := parser.FindSubmatch(input)
+				if matches == nil {
+					log.Printf("could not determine play from string: %s\n" + string(input))
+					continue
+				}
+				parsed, parseErr := strconv.Atoi(string(matches[1]))
+				if parseErr != nil {
+					continue
+				}
+
+				if parseErr == nil {
+					select {
+					case outputChan <- parsed == 1:
+					// Cool, send worked
+					default:
+						// just pass on send fails
+					}
+				}
+			}
+		}
+	}()
+
+	return outputChan
+}
