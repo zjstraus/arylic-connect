@@ -137,14 +137,14 @@ func (state WlanState) MarshalText() ([]byte, error) {
 }
 
 func (state *WlanState) unmarshalApiText(input []byte) error {
-	switch input {
-	case []byte("FAIL"):
+	switch string(input) {
+	case "FAIL":
 		*state = WLAN_FAIL
-	case []byte("PAIRFAIL"):
+	case "PAIRFAIL":
 		*state = WLAN_PAIRING_FAIL
-	case []byte("PROCESS"):
+	case "PROCESS":
 		*state = WLAN_IN_PROGRESS
-	case []byte("OK"):
+	case "OK":
 		*state = WLAN_OK
 	default:
 		*state = WLAN_FAIL

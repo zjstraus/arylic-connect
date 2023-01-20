@@ -49,6 +49,7 @@ type AsyncLine interface {
 	// RegisterPersistentReader sets up a channel to receive a message off the line
 	// every time the given prefix is received.
 	RegisterPersistentReader(prefix string, channel chan<- []byte)
+	UnregisterPersistentReader(prefix string, channel chan<- []byte)
 
 	// RegisterOneshotReader sets up a channel to receive a message off the line
 	// the first time a given prefix is received.
