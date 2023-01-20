@@ -20,7 +20,6 @@ package tcp
 
 import (
 	"errors"
-	"log"
 	"net"
 	"strings"
 	"time"
@@ -38,7 +37,6 @@ func (t *Transport) asyncReadLoop() {
 			default:
 				message, messageErr := t.readMessage(5 * time.Second)
 				if messageErr == nil {
-					log.Println(string(message))
 					t.requestLocker.Lock()
 					for prefix, receivers := range t.persistentRequests {
 						if strings.HasPrefix(string(message), prefix) {
