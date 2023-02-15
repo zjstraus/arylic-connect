@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package localWebsocketApi
 
 import (
+	"arylic-connect/localWebsocketApi/extWebsocket"
 	"arylic-connect/localWebsocketApi/httpmedia"
 	"arylic-connect/localWebsocketApi/serialmedia"
 	"fmt"
@@ -31,8 +32,9 @@ import (
 )
 
 type WebsocketManager struct {
-	serialConnections *serialmedia.SerialMediaWrapper
-	httpConnections   *httpmedia.HttpMediaWrapper
+	serialConnections    *serialmedia.SerialMediaWrapper
+	httpConnections      *httpmedia.HttpMediaWrapper
+	websocketConnections *extWebsocket.ExternalWebsocketWrapper
 }
 
 func (manager *WebsocketManager) discoverSsdp() {
@@ -42,6 +44,7 @@ func (manager *WebsocketManager) discoverSsdp() {
 	}
 	knownSerialEndpoints := manager.serialConnections.ConnectedEndpoints()
 	knownHttpEndpoints := manager.httpConnections.ConnectedEndpoints()
+	knownWebsocketEndpoints := manager.websocketConnections.ConnectedEndpoints()
 	for _, service := range ssdpList {
 		if service.Type != "urn:schemas-wiimu-com:service:PlayQueue:1" {
 			continue
@@ -50,17 +53,28 @@ func (manager *WebsocketManager) discoverSsdp() {
 		if urlErr == nil {
 			serialTarget := parsedUrl.Hostname() + ":8899"
 			httpTarget := fmt.Sprintf("http://%s/httpapi.asp", parsedUrl.Hostname())
+			wsTarget := fmt.Sprintf("ws://%s:8888/", parsedUrl.Hostname())
+			playerName := ""
 			serialConnected := false
 			httpConnected := false
+			wsConnected := false
 			for _, endpoint := range knownSerialEndpoints {
 				if endpoint.Target == serialTarget {
 					serialConnected = true
+					playerName = endpoint.Name
 					break
 				}
 			}
 			for _, endpoint := range knownHttpEndpoints {
 				if endpoint.Target == httpTarget {
 					httpConnected = true
+					playerName = endpoint.Name
+					break
+				}
+			}
+			for _, endpoint := range knownWebsocketEndpoints {
+				if endpoint.Target == wsTarget {
+					wsConnected = true
 					break
 				}
 			}
@@ -69,6 +83,7 @@ func (manager *WebsocketManager) discoverSsdp() {
 				name, connectErr := manager.serialConnections.ConnectEndpoint(serialTarget)
 				if connectErr == nil {
 					log.Printf("TCP connected to player %s\n", name)
+					playerName = name
 				}
 			}
 			if !httpConnected {
@@ -76,6 +91,17 @@ func (manager *WebsocketManager) discoverSsdp() {
 				name, connectErr := manager.httpConnections.ConnectEndpoint(httpTarget)
 				if connectErr == nil {
 					log.Printf("HTTP connected to player %s\n", name)
+					playerName = name
+				}
+			}
+			if !wsConnected {
+				if playerName == "" {
+					log.Printf("Player name could not be found for device at %s\n", wsTarget)
+				}
+				log.Printf("Discovered potential device at %s\n", parsedUrl.Hostname())
+				connectErr := manager.websocketConnections.ConnectEndpoint(wsTarget, playerName)
+				if connectErr == nil {
+					log.Printf("Websocket connected to player %s\n", playerName)
 				}
 			}
 		}
@@ -103,6 +129,10 @@ func (manager *WebsocketManager) wsRpcLoop() error {
 	if httpMediaErr != nil {
 		panic(httpMediaErr)
 	}
+	wsMediaErr := rpcServer.RegisterName("websocketmedia", manager.websocketConnections)
+	if wsMediaErr != nil {
+		panic(wsMediaErr)
+	}
 
 	uiDist := http.FileServer(http.Dir("localWebUi/dist"))
 	http.Handle("/", uiDist)
@@ -113,8 +143,9 @@ func (manager *WebsocketManager) wsRpcLoop() error {
 
 func RunWebsocketServer() error {
 	manager := WebsocketManager{
-		serialConnections: serialmedia.New(),
-		httpConnections:   httpmedia.New(),
+		serialConnections:    serialmedia.New(),
+		httpConnections:      httpmedia.New(),
+		websocketConnections: extWebsocket.New(),
 	}
 
 	go manager.ssdpLoop()

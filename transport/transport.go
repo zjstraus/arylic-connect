@@ -31,6 +31,7 @@ type InterfaceFlavor int
 const (
 	Flavor_TCP InterfaceFlavor = iota // UART over a TCP connection to a Linkplay module
 	Flavor_HTTP
+	Flavor_WS
 )
 
 // AsyncLine is an interface for a family of connections using a string request -
@@ -79,5 +80,33 @@ type HTTP interface {
 	Flavor() InterfaceFlavor
 
 	Close() error
+	Target() string
+}
+
+type AsyncMessage interface {
+	Connect(target string) error
+
+	// RegisterPersistentReader sets up a channel to receive a message off the line
+	// every time the given prefix is received.
+	RegisterPersistentReader(command string, channel chan<- []byte)
+	UnregisterPersistentReader(command string, channel chan<- []byte)
+
+	// RegisterOneshotReader sets up a channel to receive a message off the line
+	// the first time a given prefix is received.
+	// Returns true if there was already at least one reader queued for that prefix
+	RegisterOneshotReader(command string, channel chan<- []byte) bool
+
+	SendMessageAtomic(ctx context.Context, message interface{}, command string, outchan chan<- []byte) error
+
+	// SendMessage puts a message out on the connection.
+	SendMessage(ctx context.Context, message interface{}) error
+
+	// Flavor returns the InterfaceFlavor corresponding to this implementation
+	// so that it can be used to switch command formats.
+	Flavor() InterfaceFlavor
+
+	Close() error
+
+	// Target returns the connection target string.
 	Target() string
 }
