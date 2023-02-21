@@ -102,6 +102,8 @@ func (manager *WebsocketManager) discoverSsdp() {
 				connectErr := manager.websocketConnections.ConnectEndpoint(wsTarget, playerName)
 				if connectErr == nil {
 					log.Printf("Websocket connected to player %s\n", playerName)
+				} else {
+					log.Printf("Error conecting to websocket: %s\n", connectErr.Error())
 				}
 			}
 		}

@@ -23,10 +23,59 @@ import (
 	"encoding/json"
 )
 
+type incomingStatusChangeMessage struct {
+	Input  string `json:"input"`
+	Volume int    `json:"vol"`
+	Track  struct {
+		Source   string `json:"source"`
+		State    string `json:"state"`
+		Index    int    `json:"index"`
+		Mode     string `json:"mode"`
+		Elapsed  int    `json:"elapsed"`
+		Duration int    `json:"duration"`
+		Meta     struct {
+			Title  string `json:"title"`
+			Artist string `json:"artist"`
+			Album  string `json:"album"`
+			Image  string `json:"image"`
+		} `json:"meta"`
+	} `json:"track"`
+}
+
+func (msg incomingStatusChangeMessage) Normalize() StatusChangeMessage {
+	return StatusChangeMessage{
+		Input:    msg.Input,
+		Source:   msg.Track.Source,
+		State:    msg.Track.State,
+		Index:    msg.Track.Index,
+		Mode:     msg.Track.Mode,
+		Elapsed:  msg.Track.Elapsed,
+		Duration: msg.Track.Duration,
+		Title:    msg.Track.Meta.Title,
+		Artist:   msg.Track.Meta.Artist,
+		Album:    msg.Track.Meta.Album,
+		Image:    msg.Track.Meta.Image,
+		Volume:   msg.Volume,
+	}
+}
+
 type StatusChangeMessage struct {
-	Input  string          `json:"input"`
-	Volume int             `json:"vol"`
-	Track  json.RawMessage `json:"track"`
+	Input  string
+	Source string
+
+	State string
+	Index int
+	Mode  string
+
+	Elapsed  int
+	Duration int
+
+	Title  string
+	Artist string
+	Album  string
+	Image  string
+
+	Volume int
 }
 
 func (rpc *RPC) StatusChangeChannel(ctx context.Context) <-chan StatusChangeMessage {
@@ -46,11 +95,11 @@ func (rpc *RPC) StatusChangeChannel(ctx context.Context) <-chan StatusChangeMess
 			case <-ctx.Done():
 				return
 			case input := <-inputChan:
-				outputMessage := StatusChangeMessage{}
+				outputMessage := incomingStatusChangeMessage{}
 				parseErr := json.Unmarshal(input, &outputMessage)
 				if parseErr == nil {
 					select {
-					case outputChan <- outputMessage:
+					case outputChan <- outputMessage.Normalize():
 					// Cool, send worked
 					default:
 						// just pass on send fails

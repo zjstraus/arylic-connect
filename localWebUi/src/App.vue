@@ -18,11 +18,17 @@
 import {onMounted, ref, computed} from "vue";
 import {useWebsocketStore} from "@/stores/baseWebsocket";
 import {useSerialMediaApi} from "@/stores/serialMediaApi";
+import {useUIStateStore} from "@/stores/uiState";
 
 const theme = ref('dark')
 const drawer = ref(false)
 const wsStore = useWebsocketStore()
 const serialMediaApi = useSerialMediaApi()
+const uiState = useUIStateStore()
+
+const showAppBar = computed(() => {
+  return uiState.appBarActive
+})
 
 onMounted(async () => {
   await wsStore.connect()
@@ -51,7 +57,7 @@ function setActivePlayer() {
 
 <template>
   <v-app :theme="theme">
-    <v-app-bar>
+    <v-app-bar v-if="showAppBar">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer">
       </v-app-bar-nav-icon>
 
@@ -65,7 +71,7 @@ function setActivePlayer() {
 
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer">
+    <v-navigation-drawer v-if="showAppBar" v-model="drawer">
       <v-list-item>
         <v-combobox
             label="player"
@@ -76,6 +82,6 @@ function setActivePlayer() {
       </v-list-item>
     </v-navigation-drawer>
 
-    <v-main><router-view></router-view></v-main>
+    <v-main><router-view height="100%"></router-view></v-main>
   </v-app>
 </template>

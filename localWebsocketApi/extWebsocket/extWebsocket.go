@@ -68,6 +68,8 @@ func (wrapper *ExternalWebsocketWrapper) ConnectEndpoint(target string, name str
 		delete(wrapper.HttpMediaCons, name)
 	}
 
+	rpc.GetStatus(ctx)
+
 	wrapper.HttpMediaCons[name] = rpc
 
 	return nil
@@ -86,7 +88,7 @@ func (wrapper *ExternalWebsocketWrapper) ConnectedEndpoints() []EndpointInfo {
 	for name, endpoint := range wrapper.HttpMediaCons {
 		endpoints = append(endpoints, EndpointInfo{
 			Name:   name,
-			Target: endpoint.TransportTarget(),
+			Target: "ws://" + endpoint.TransportTarget() + "/",
 		})
 	}
 

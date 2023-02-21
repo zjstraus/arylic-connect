@@ -16,22 +16,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package websocketControl
+package extWebsocket
 
 import (
+	"arylic-connect/rpcWrapper/websocketControl"
 	"context"
-	"encoding/json"
+	"errors"
 )
 
-// GetStatus queries the device for its current status summary.
-func (rpc *RPC) GetStatus(ctx context.Context) (StatusChangeMessage, error) {
+func (wrapper *ExternalWebsocketWrapper) GetStatus(ctx context.Context, target string) (websocketControl.StatusChangeMessage, error) {
+	wrapper.OpLock.RLock()
+	defer wrapper.OpLock.RUnlock()
 
-	status := incomingStatusChangeMessage{}
-
-	data, reqErr := requestWithResponse(ctx, rpc.transport, "#CMD:STATUS", "STATUS")
-	if reqErr != nil {
-		return status.Normalize(), reqErr
+	connection, hasConnection := wrapper.HttpMediaCons[target]
+	if !hasConnection {
+		return websocketControl.StatusChangeMessage{}, errors.New("endpoint not found")
 	}
-	jsonErr := json.Unmarshal(data, &status)
-	return status.Normalize(), jsonErr
+
+	return connection.GetStatus(ctx)
 }

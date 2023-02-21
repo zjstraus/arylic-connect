@@ -1,6 +1,6 @@
 /*
 arylic-connect, an API broker for Arylic Audio devices
-Copyright (C) 2022  Zach Strauss
+Copyright (C) 2023  Zach Strauss
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,12 +27,27 @@ interface endpointIdentifier {
 interface websocketStoreState {
     client: RpcWebSocketClient,
     endpoints: endpointIdentifier[]
+    subsciptionCallbacks: Map<string, (data: object) => void>
+}
+
+interface subscriptionReturn {
+    result: string
+}
+
+interface subscriptionUpdate {
+    result: any
+    subscription: string
+}
+
+interface subscriptionUpdateWrapper {
+    params: subscriptionUpdate
 }
 
 export const useWebsocketStore = defineStore('websocket',  {
     state: (): websocketStoreState => ({
         client: new RpcWebSocketClient(),
-        endpoints: []
+        endpoints: [],
+        subsciptionCallbacks: new Map<string, (data: object) => void>()
     }),
     getters: {
     },
@@ -44,9 +59,25 @@ export const useWebsocketStore = defineStore('websocket',  {
                 }
             }
             await this.client.connect("ws://localhost:8080/ws")
+            this.client.onNotification.push((data: object) => {
+                let cast = data as subscriptionUpdateWrapper
+                let cb = this.subsciptionCallbacks.get(cast.params.subscription)
+                if (cb) {
+                    cb(cast.params.result)
+                }
+            })
+            this.client.onRequest.push((data: object) => {
+                console.log(data)
+            })
+            //this.client.listenMessages()
         },
         async refreshEndpoints() {
             this.endpoints = await this.client.call("serialmedia_connectedEndpoints") as endpointIdentifier[]
+        },
+        async addSubscription(method: string, params: any, cb: (data: object) => void) {
+            await this.connect()
+            let result = await this.client.call(method, params) as string
+            this.subsciptionCallbacks.set(result, cb)
         }
     }
 })

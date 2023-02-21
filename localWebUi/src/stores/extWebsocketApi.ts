@@ -28,42 +28,27 @@ interface serialmediaEndpointVersion {
 }
 
 
-export const useSerialMediaApi = defineStore("serialMediaApi", () => {
+export const useExternalWebsocketApi = defineStore("externalWebsocketApi", () => {
     const ws = useWebsocketStore()
 
     const activePlayer = ref("")
-    const endpointVersion = ref({
-        Git: "",
-        Firmware: "",
-        API: ""
-    } as serialmediaEndpointVersion)
 
-    async function getEndpointVersion() {
-        await ws.connect()
-        endpointVersion.value = await ws.client.call("serialmedia_getVersion", [activePlayer.value]) as serialmediaEndpointVersion
-    }
 
     const throttledCalls: { [key: string]: Function } = {}
 
     async function makeCall(submethod: string, params: any[]) {
         await ws.connect()
+        params.unshift(activePlayer.value)
         if (! (submethod in throttledCalls)) {
             throttledCalls[submethod] = throttle((params: any[]) => {
-                return ws.client.call("serialmedia_" + submethod, params)
-            }, 200)
+                return ws.client.call("websocketmedia_" + submethod, params)
+            }, 15)
         }
-        params.unshift(activePlayer.value)
         return throttledCalls[submethod](params)
         //return ws.client.call("serialmedia_" + submethod, params)
     }
 
-    async function addSubscription(name: string, cb: (data: object) => void) {
-        let method = "serialmedia_subscribe"
-        let params = [name, activePlayer.value]
-        return ws.addSubscription(method, params, cb)
-    }
 
 
-
-    return {activePlayer, endpointVersion, getEndpointVersion, makeCall, addSubscription}
+    return {activePlayer, makeCall}
 })

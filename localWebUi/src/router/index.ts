@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import NowPlayingView from "../views/NowPlayingView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,11 @@ const router = createRouter({
       name: 'home',
       component: HomeView
     },
+    {
+      path: '/nowplaying/:player',
+      name: 'Now Playing',
+      component: NowPlayingView
+    }
   ]
 })
 

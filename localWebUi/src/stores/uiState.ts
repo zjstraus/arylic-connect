@@ -16,22 +16,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package websocketControl
+import {defineStore} from "pinia";
 
-import (
-	"context"
-	"encoding/json"
-)
-
-// GetStatus queries the device for its current status summary.
-func (rpc *RPC) GetStatus(ctx context.Context) (StatusChangeMessage, error) {
-
-	status := incomingStatusChangeMessage{}
-
-	data, reqErr := requestWithResponse(ctx, rpc.transport, "#CMD:STATUS", "STATUS")
-	if reqErr != nil {
-		return status.Normalize(), reqErr
-	}
-	jsonErr := json.Unmarshal(data, &status)
-	return status.Normalize(), jsonErr
+interface uiStateStoreState {
+    appBarActive: boolean,
 }
+
+export const useUIStateStore = defineStore('uiState',  {
+    state: (): uiStateStoreState => ({
+        appBarActive: true
+    }),
+    getters: {
+    },
+    actions: {
+    }
+})
