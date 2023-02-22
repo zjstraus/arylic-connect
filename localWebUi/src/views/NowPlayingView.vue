@@ -69,6 +69,7 @@ setInterval(async () => {
   width: 100%;
   height: 80px;
   color: rgba(255, 255, 255, 1);
+  font-family: sans-serif;
   font-style: normal;
   font-size: 48px;
   font-weight: 400;
@@ -82,7 +83,7 @@ setInterval(async () => {
   width: 100%;
   height: 50px;
   color: rgba(255, 255, 255, 1);
-  font-family: 'sourcesanspro';
+  font-family: sans-serif;
   font-style: normal;
   font-size: 36px;
   font-weight: 400;
@@ -95,13 +96,16 @@ setInterval(async () => {
 
 <template>
   <main>
-    <div class="d-flex" style="padding: 10px 20px; gap: 15px;">
+    <div :style="{backgroundImage:`url(${wsStatus.image})`, backgroundSize:'100% 100%', filter: 'blur(30px) brightness(50%)', position:'absolute', height:'100%', width:'100%'}">
+    </div>
+
+    <div class="d-flex" style="padding: 10px 20px; gap: 15px; z-index: 2;position: absolute; width: 100%" >
       <v-card width="300">
         <Transition>
         <v-img aspect-ratio="1" :src="wsStatus.image"></v-img>
         </Transition>
       </v-card>
-      <v-card variant="tonal" class="d-flex flex-column" style="flex-grow: 1; padding: 0px 10px;">
+      <v-card variant="tonal" class="d-flex flex-column" color="rgba(0,0,0,.2)" style="flex-grow: 1; padding: 0px 10px; backdrop-filter: blur()">
         <div class="titleText">
           {{ wsStatus.title }}
         </div>
