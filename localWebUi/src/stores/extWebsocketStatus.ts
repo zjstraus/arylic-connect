@@ -68,6 +68,11 @@ export const useExternalWebsocketApiStatus = defineStore("externalWebsocketApiSt
         volume.value = msg.Volume
         artist.value = msg.Artist
     }
+    setInterval(() => {
+        if (elapsed.value < duration.value) {
+            elapsed.value += 1
+        }
+    }, 1000)
 
     // async function subscribeStatus() {
     //     await api.addSubscription("metadataChanges", (data: object) => {

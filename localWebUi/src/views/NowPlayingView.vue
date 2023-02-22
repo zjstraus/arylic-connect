@@ -115,6 +115,19 @@ setInterval(async () => {
         <div class="infoText">
           {{ wsStatus.album }}
         </div>
+        <div class="infoText">
+          <div class="d-flex align-center" style="gap: 5px">
+            <div>
+              {{ new Date(wsStatus.elapsed * 1000).toISOString().slice(14, 19) }}
+            </div>
+            <v-progress-linear style="flex-grow: 1;" :max="wsStatus.duration" :model-value="wsStatus.elapsed">
+            </v-progress-linear>
+            <div>
+              {{ new Date(wsStatus.duration * 1000).toISOString().slice(14, 19) }}
+            </div>
+          </div>
+
+        </div>
       </v-card>
       <v-card variant="tonal" width="100">Controls</v-card>
     </div>
