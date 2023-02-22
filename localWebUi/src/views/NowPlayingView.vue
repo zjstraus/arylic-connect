@@ -24,12 +24,14 @@ import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
 import {useExternalWebsocketApiStatus} from "@/stores/extWebsocketStatus";
 import {useExternalWebsocketApi} from "@/stores/extWebsocketApi";
+import {useSerialMediaApiTransport} from "@/stores/serialMediaTransport";
 
 const wsStore = useWebsocketStore()
 const wsApi = useExternalWebsocketApi()
 const wsStatus = useExternalWebsocketApiStatus()
 const serialMetadataStore = useSerialMediaApiMetadata()
 const serialMediaStore = useSerialMediaApi()
+const serialTransportStore = useSerialMediaApiTransport()
 const uiState = useUIStateStore()
 
 onMounted(async () => {
@@ -57,6 +59,22 @@ watch(
     }
 )
 
+async function transportNext() {
+  await serialTransportStore.triggerNext()
+}
+
+async function transportPrevious() {
+  await serialTransportStore.triggerPrevious()
+}
+
+async function transportStop() {
+  await serialTransportStore.triggerStop()
+}
+
+async function transportPlayPause() {
+  await serialTransportStore.triggerPlayPause()
+}
+
 setInterval(async () => {
   await wsStatus.pollStatus()
 }, 10000)
@@ -77,6 +95,7 @@ setInterval(async () => {
   letter-spacing: 0px;
   text-decoration: none;
   text-transform: none;
+  white-space: nowrap;
 }
 /* Text */
 .infoText {
@@ -91,6 +110,11 @@ setInterval(async () => {
   letter-spacing: 0px;
   text-decoration: none;
   text-transform: none;
+  white-space: nowrap;
+}
+
+.btn {
+  color: white;
 }
 </style>
 
@@ -105,8 +129,8 @@ setInterval(async () => {
         <v-img aspect-ratio="1" :src="wsStatus.image"></v-img>
         </Transition>
       </v-card>
-      <v-card variant="tonal" class="d-flex flex-column" color="rgba(0,0,0,.2)" style="flex-grow: 1; padding: 0px 10px; backdrop-filter: blur()">
-        <div class="titleText">
+      <v-card variant="tonal" class="d-flex flex-column" color="rgba(0,0,0,.2)" style="flex-grow: 1; padding: 0px 10px;">
+        <div class="titleText overflow-hidden">
           {{ wsStatus.title }}
         </div>
         <div class="infoText">
@@ -126,10 +150,24 @@ setInterval(async () => {
               {{ new Date(wsStatus.duration * 1000).toISOString().slice(14, 19) }}
             </div>
           </div>
+        </div>
 
+        <div class="d-flex" style="gap: 10px; flex-grow: 1">
+
+          <v-btn variant="tonal" rounded="false" @click="transportPrevious" style="flex-grow: 1; height: 100%">
+            <v-icon color="grey-lighten-1" size="68"  icon="mdi-skip-previous"></v-icon>
+          </v-btn>
+<!--          <v-btn variant="tonal" rounded="false" @click="transportStop" style="flex-grow: 1; height: 100%">-->
+<!--            <v-icon color="white" size="72"  icon="mdi-stop"></v-icon>-->
+<!--          </v-btn>-->
+          <v-btn variant="tonal" rounded="false" @click="transportPlayPause" style="flex-grow: 1.5; height: 100%;">
+            <v-icon color="white" size="72"  icon="mdi-play-pause"></v-icon>
+          </v-btn>
+          <v-btn variant="tonal" rounded="false" @click="transportNext" style="flex-grow: 1; height: 100%">
+            <v-icon color="grey-lighten-1" size="68" icon="mdi-skip-next"></v-icon>
+          </v-btn>
         </div>
       </v-card>
-      <v-card variant="tonal" width="100">Controls</v-card>
     </div>
   </main>
 </template>
