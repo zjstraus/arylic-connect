@@ -35,6 +35,9 @@ const serialTransportStore = useSerialMediaApiTransport()
 const uiState = useUIStateStore()
 
 onMounted(async () => {
+  let elHtml = document.getElementsByTagName('html')[0]
+  elHtml.style.overflowY = 'hidden'
+
   uiState.appBarActive = false
   await wsStore.connect()
   serialMediaStore.activePlayer = route.params.player as string
@@ -78,6 +81,7 @@ async function transportPlayPause() {
 setInterval(async () => {
   await wsStatus.pollStatus()
 }, 10000)
+
 
 </script>
 
@@ -123,7 +127,7 @@ setInterval(async () => {
     <div :style="{backgroundImage:`url(${wsStatus.image})`, backgroundSize:'100% 100%', filter: 'blur(30px) brightness(50%)', position:'absolute', height:'100%', width:'100%'}">
     </div>
 
-    <div class="d-flex" style="padding: 10px 20px; gap: 15px; z-index: 2;position: absolute; width: 100%" >
+    <div class="d-flex" style="padding: 10px 20px; gap: 15px; z-index: 2;position: absolute; width: 100%; height: 100%" >
       <v-card width="300">
         <Transition>
         <v-img aspect-ratio="1" :src="wsStatus.image"></v-img>
