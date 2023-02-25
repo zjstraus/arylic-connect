@@ -21,6 +21,7 @@ package websocketControl
 import (
 	"context"
 	"encoding/json"
+	"golang.org/x/net/html"
 )
 
 type incomingStatusChangeMessage struct {
@@ -51,9 +52,9 @@ func (msg incomingStatusChangeMessage) Normalize() StatusChangeMessage {
 		Mode:     msg.Track.Mode,
 		Elapsed:  msg.Track.Elapsed,
 		Duration: msg.Track.Duration,
-		Title:    msg.Track.Meta.Title,
-		Artist:   msg.Track.Meta.Artist,
-		Album:    msg.Track.Meta.Album,
+		Title:    html.UnescapeString(msg.Track.Meta.Title),
+		Artist:   html.UnescapeString(msg.Track.Meta.Artist),
+		Album:    html.UnescapeString(msg.Track.Meta.Album),
 		Image:    msg.Track.Meta.Image,
 		Volume:   msg.Volume,
 	}
