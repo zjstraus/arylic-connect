@@ -58,7 +58,11 @@ export const useWebsocketStore = defineStore('websocket',  {
                     return
                 }
             }
-            await this.client.connect("ws://localhost:8080/ws")
+            if (import.meta.env.DEV) {
+                await this.client.connect(`ws://localhost:8080/ws`)
+            } else {
+                await this.client.connect(`ws://${window.location.host}/ws`)
+            }
             this.client.onNotification.push((data: object) => {
                 let cast = data as subscriptionUpdateWrapper
                 let cb = this.subsciptionCallbacks.get(cast.params.subscription)

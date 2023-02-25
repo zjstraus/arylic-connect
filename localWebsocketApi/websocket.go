@@ -22,9 +22,13 @@ import (
 	"arylic-connect/localWebsocketApi/extWebsocket"
 	"arylic-connect/localWebsocketApi/httpmedia"
 	"arylic-connect/localWebsocketApi/serialmedia"
+	"bytes"
+	"embed"
 	"fmt"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/koron/go-ssdp"
+	"io"
+	"io/fs"
 	"log"
 	"net/http"
 	"net/url"
@@ -121,6 +125,9 @@ func (manager *WebsocketManager) ssdpLoop() {
 	}
 }
 
+//go:embed dist
+var uiDist embed.FS
+
 func (manager *WebsocketManager) wsRpcLoop() error {
 	rpcServer := rpc.NewServer()
 	serialMediaErr := rpcServer.RegisterName("serialmedia", manager.serialConnections)
@@ -136,9 +143,21 @@ func (manager *WebsocketManager) wsRpcLoop() error {
 		panic(wsMediaErr)
 	}
 
-	uiDist := http.FileServer(http.Dir("localWebUi/dist"))
-	http.Handle("/", uiDist)
 	http.Handle("/ws", rpcServer.WebsocketHandler([]string{"*"}))
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "localWebUi/dist/favicon.ico")
+	})
+
+	pathStrippedUiDist, _ := fs.Sub(uiDist, "dist")
+	uiServer := http.FileServer(http.FS(pathStrippedUiDist))
+	http.Handle("/assets/", uiServer)
+
+	indexFile, _ := uiDist.Open("dist/index.html")
+	indexData, _ := io.ReadAll(indexFile)
+	indexReadSeeker := bytes.NewReader(indexData)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeContent(w, r, "index.html", time.Time{}, indexReadSeeker)
+	})
 	log.Println("Starting web server")
 	return http.ListenAndServe(":8080", nil)
 }
